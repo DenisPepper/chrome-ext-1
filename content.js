@@ -22,3 +22,6 @@ window.addEventListener("trigger-title-check", () => {
   // Отправляем текст обратно в расширение (его поймает sidepanel.js)
   chrome.runtime.sendMessage({ action: "send-title", data: msg });
 });
+
+
+chrome.runtime.sendMessage({ action: "ready-for-action" });

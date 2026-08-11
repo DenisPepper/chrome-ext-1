@@ -9,11 +9,12 @@ chrome.sidePanel
   .catch((error) => console.error("Ошибка активации панели:", error));
 
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete") {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "ready-for-action") {
+    const tabId = sender.tab.id;
     chrome.tabs.sendMessage(tabId, {
       action: "update-config",
       data: { es: EventStore }
-    });
+    }).catch(() => { });
   }
 });
