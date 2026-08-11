@@ -3,8 +3,8 @@
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "update-config") {
-    const { es } = message.data;
-    console.log("Получен EventStore:", es);
+    //const { es } = message.data;
+    console.dir(message.data);
     // Здесь только читаем, не патчим window
   }
 });
