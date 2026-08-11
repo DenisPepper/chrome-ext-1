@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "SK-toolbox",
+  "version": "1.0",
+  "permissions": ["sidePanel", "activeTab", "scripting"],
+  "host_permissions": ["https://site/*"],
+  "icons": {
+    "48": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_icon": "icon.png",
+    "default_title": "Панель инструментов SK-toolbox"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://site/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
