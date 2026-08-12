@@ -6,7 +6,7 @@ import { EventStore as es } from "./common/event-store.js";
 
 // Слушаем сообщения от content.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === es.TRIGGER_TITLE_CHECK) {
+  if (message.action === es.RETURN_PAGE_TITLE) {
     logit(`Получен заголовок страницы: ${message.data}`);
   }
 });
