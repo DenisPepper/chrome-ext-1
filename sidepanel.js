@@ -12,10 +12,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 document.getElementById("show-title").addEventListener("click", async () => {
+  // 1. Получаем активную вкладку
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   // Проверяем, существует ли вкладка и есть ли у нее URL
-  if (!tab || !tab.url) return;
+  if (!tab || !tab.url || !tab.id) return;
 
   /*
   Метод chrome.scripting.executeScript используется:
@@ -27,21 +28,27 @@ document.getElementById("show-title").addEventListener("click", async () => {
   5. Внедрение кода на любые сайты (activeTab) — выполнение скриптов на страницах без необходимости запрашивать постоянный доступ ко всем сайтам в манифесте.
 
   */
+  // 2. Внедряем скрипт, который просто возвращает (return) строку
   chrome.scripting
     .executeScript({
       target: { tabId: tab.id },
-      world: "MAIN",
-      args: [es],
-      // ключ args ☝️ передает массив аргументов в callback-функцию ключа func 👇
-      // это нужно потому что, callback-функця ключа func исполняется в изолированном контексте
-      // не видит импорты этого модуля и прочие идентификаторы
-      func: (...args) => {
-        const evs = args[0];
-        window.dispatchEvent(new CustomEvent(evs.TRIGGER_TITLE_CHECK));
+      func: () => {
+        // Этот код выполнится на странице и вернет результат
+        const titleTag = document.querySelector("head title");
+        return titleTag ? titleTag.textContent : "no title on this page";
       },
     })
+    .then((results) => {
+      // 3. Получаем результат выполнения скрипта прямо здесь
+      if (!results || !results[0]) return;
+
+      const msg = results[0].result; // Вот ваш заголовок страницы
+
+      // 4. Имитируем отправку сообщения внутри самой боковой панели
+      // (или просто вызываем функцию логирования)
+      logit(`Получен заголовок страницы: ${msg}`);
+    })
     .catch((err) => {
-      // Дополнительный отлов любых других ошибок внедрения
-      console.error("Ошибка внедрения скрипта:", err.message);
+      console.error("Ошибка сбора заголовка:", err.message);
     });
 });
