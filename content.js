@@ -7,7 +7,7 @@ function addTabChecking(fn) {
     if (document.hidden) return;
     // Игнорируем iframe (если нужно)
     if (window !== window.top) return;
-    fn.apply(this, args);
+    fn(...args);
   };
 }
 
