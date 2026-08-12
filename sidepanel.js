@@ -5,7 +5,7 @@ import { logit } from "./tools/util.js";
 
 document.getElementById("show-title").addEventListener("click", async () => {
   // 1. Получаем активную вкладку
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
 
   // Проверяем, существует ли вкладка и есть ли у нее URL
   if (!tab || !tab.url || !tab.id) return;
