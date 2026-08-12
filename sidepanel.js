@@ -1,23 +1,17 @@
-import { logit } from "./tools/util.js";
+import { logit, getActiveTab, isInjectableTab } from "./tools/util.js";
 
 // тяжёлые вычисления размещать здесь
 // очень тяжёлые передаем в web worker
 
-document.getElementById("show-title").addEventListener("click", async () => {
-  // 1. Получаем активную вкладку
-  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+// декомпозированный пример с кнопкой
+const btn = document.getElementById("show-title");
 
-  // Проверяем, существует ли вкладка и есть ли у нее URL
-  if (!tab || !tab.url || !tab.id) return;
+const handleClick = async () => {
+  // 1. Получаем активную вкладку через утилиту
+  const tab = await getActiveTab();
 
-  // Явная проверка протокола (защита от служебных страниц chrome:// и др.)
-  const allowedProtocols = ['http:', 'https:'];
-  try {
-    const url = new URL(tab.url);
-    if (!allowedProtocols.includes(url.protocol)) return;
-  } catch (e) {
-    return;
-  }
+  // 2. Проверяем, можно ли внедрять скрипты (валидация протокола и URL)
+  if (!isInjectableTab(tab)) return;
 
   /*
     Метод chrome.scripting.executeScript используется:
@@ -26,9 +20,9 @@ document.getElementById("show-title").addEventListener("click", async () => {
     3. Мгновенный сбор данных — срочное извлечение информации со страницы (текст, ссылки, метаданные) и возврат результата обратно в расширение через return функции.
     4. Взаимодействие с контекстом сайта (world: "MAIN") — внедрение кода напрямую в среду страницы для работы с её внутренними JS-переменными, функциями, библиотеками (React, Vue) или генерации событий.
     5. Внедрение кода на любые сайты (activeTab) — выполнение скриптов на страницах без необходимости запрашивать постоянный доступ ко всем сайтам в манифесте.
-  
-    */
-  // 2. Внедряем скрипт, который просто возвращает (return) строку
+  */
+
+  // 3. Внедряем скрипт, который просто возвращает (return) строку
   chrome.scripting
     .executeScript({
       target: { tabId: tab.id },
@@ -39,16 +33,18 @@ document.getElementById("show-title").addEventListener("click", async () => {
       },
     })
     .then((results) => {
-      // 3. Получаем результат выполнения скрипта прямо здесь
+      // 4. Получаем результат выполнения скрипта прямо здесь
       if (!results || !results[0]) return;
 
       const msg = results[0].result; // Вот ваш заголовок страницы
 
-      // 4. Имитируем отправку сообщения внутри самой боковой панели
+      // 5. Имитируем отправку сообщения внутри самой боковой панели
       // (или просто вызываем функцию логирования)
       logit(`Получен заголовок страницы: ${msg}`);
     })
     .catch((err) => {
       console.error("Ошибка сбора заголовка:", err.message);
     });
-});
+};
+
+btn.addEventListener("click", handleClick);
