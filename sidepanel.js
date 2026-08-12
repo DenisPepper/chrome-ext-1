@@ -17,6 +17,8 @@ document.getElementById("show-title").addEventListener("click", async () => {
   // Проверяем, существует ли вкладка и есть ли у нее URL
   if (!tab || !tab.url) return;
 
+  // Метод chrome.scripting.executeScript используется для динамического внедрения 
+  // и запуска JavaScript-кода на веб-страницах прямо во время работы расширения 
   chrome.scripting
     .executeScript({
       target: { tabId: tab.id },
