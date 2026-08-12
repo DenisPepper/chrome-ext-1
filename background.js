@@ -1,5 +1,3 @@
-import { EventStore } from "./common/event-store.js"
-
 // фоновый скрипт (Service Worker)
 
 
@@ -14,7 +12,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const tabId = sender.tab.id;
     chrome.tabs.sendMessage(tabId, {
       action: "UPDATE_CONTENT_CONFIG",
-      data: { es: EventStore }
+      data: { meta: 'Service Worker data' }
     }).catch(() => { });
   }
 });

@@ -1,15 +1,7 @@
 import { logit } from "./tools/util.js";
-import { EventStore as es } from "./common/event-store.js";
 
 // тяжёлые вычисления размещать здесь
 // очень тяжёлые передаем в web worker
-
-// Слушаем сообщения от content.js
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === es.RETURN_PAGE_TITLE) {
-    logit(`Получен заголовок страницы: ${message.data}`);
-  }
-});
 
 document.getElementById("show-title").addEventListener("click", async () => {
   // 1. Получаем активную вкладку

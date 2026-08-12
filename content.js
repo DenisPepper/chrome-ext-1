@@ -12,30 +12,9 @@
 6. Внедрение стилей — изоляция интерфейса расширения внутри страницы с помощью Shadow DOM.
 */
 
-function addTabChecking(fn) {
-  return function (...args) {
-    // Игнорируем, если вкладка не активна или не видна
-    if (document.hidden) return;
-    // Игнорируем iframe (если нужно)
-    if (window !== window.top) return;
-    fn(...args);
-  };
-}
-
-const useCopyButtonHandler = (es) => {
-  const fn = () => {
-    const titleTag = document.querySelector("head title");
-    const msg = titleTag ? titleTag.textContent : "no title on this page";
-    chrome.runtime.sendMessage({ action: es.RETURN_PAGE_TITLE, data: msg });
-  }
-  const handler = addTabChecking(fn)
-  window.addEventListener(es.TRIGGER_TITLE_CHECK, handler);
-}
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "UPDATE_CONTENT_CONFIG") {
-    const { es } = message.data;
-    useCopyButtonHandler(es)
+    console.log('Полученны данные от Service Worker', message.data);
   }
 });
 
