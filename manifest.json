@@ -5,23 +5,23 @@
   "permissions": ["sidePanel", "activeTab", "scripting"],
   "host_permissions": ["https://site/*"],
   "icons": {
-    "48": "icon.png"
+    "48": "ext/icon.png"
   },
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "ext/background.js",
     "type": "module"
   },
   "side_panel": {
-    "default_path": "sidepanel.html"
+    "default_path": "ext/index.html"
   },
   "action": {
-    "default_icon": "icon.png",
+    "default_icon": "ext/icon.png",
     "default_title": "Панель инструментов SK-toolbox"
   },
   "content_scripts": [
     {
       "matches": ["https://site/*"],
-      "js": ["content.js"]
+      "js": ["ext/content.js"]
     }
   ]
 }
