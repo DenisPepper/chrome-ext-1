@@ -1,12 +1,12 @@
 import { logit } from "./tools/util.js";
-import { EventStore } from "./common/event-store.js";
+import { EventStore as es } from "./common/event-store.js";
 
 // тяжёлые вычисления размещать здесь
 // очень тяжёлые передаем в web worker
 
 // Слушаем сообщения от content.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "send-title") {
+  if (message.action === es.TRIGGER_TITLE_CHECK) {
     logit(`Получен заголовок страницы: ${message.data}`);
   }
 });

@@ -1,3 +1,6 @@
 export const EventStore = {
-  TRIGGER_TITLE_CHECK: "trigger-title-check",
+  TRIGGER_TITLE_CHECK: "TRIGGER_TITLE_CHECK",
+  RETURN_PAGE_TITLE: "RETURN_PAGE_TITLE",
 };
+
+

@@ -10,10 +10,10 @@ chrome.sidePanel
 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "ready-for-action") {
+  if (message.action === "CONTENT_SCRIPT_READY") {
     const tabId = sender.tab.id;
     chrome.tabs.sendMessage(tabId, {
-      action: "update-config",
+      action: "UPDATE_CONTENT_CONFIG",
       data: { es: EventStore }
     }).catch(() => { });
   }
