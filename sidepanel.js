@@ -21,13 +21,13 @@ document.getElementById("show-title").addEventListener("click", async () => {
     .executeScript({
       target: { tabId: tab.id },
       world: "MAIN",
-      args: [EventStore],
+      args: [es],
       // ключ args ☝️ передает массив аргументов в callback-функцию ключа func 👇
       // это нужно потому что, callback-функця ключа func исполняется в изолированном контексте
       // не видит импорты этого модуля и прочие идентификаторы
       func: (...args) => {
-        const EventStore = args[0];
-        window.dispatchEvent(new CustomEvent(EventStore.TRIGGER_TITLE_CHECK));
+        const evs = args[0];
+        window.dispatchEvent(new CustomEvent(evs.TRIGGER_TITLE_CHECK));
       },
     })
     .catch((err) => {
