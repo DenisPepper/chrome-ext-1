@@ -2,26 +2,36 @@
   "manifest_version": 3,
   "name": "SK-toolbox",
   "version": "1.0",
-  "permissions": ["sidePanel", "activeTab", "scripting"],
-  "host_permissions": ["https://site/*"],
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://site/*"
+  ],
   "icons": {
     "48": "ext/icon.png"
-  },
-  "background": {
-    "service_worker": "ext/worker/index.js",
-    "type": "module"
-  },
-  "side_panel": {
-    "default_path": "ext/panel/index.html"
   },
   "action": {
     "default_icon": "ext/icon.png",
     "default_title": "Панель инструментов SK-toolbox"
   },
+  "side_panel": {
+    "default_path": "ext/panel/index.html"
+  },
+  "background": {
+    "service_worker": "ext/worker/index.js",
+    "type": "module"
+  },
   "content_scripts": [
     {
-      "matches": ["https://site/*"],
-      "js": ["ext/page/index.js"]
+      "matches": [
+        "https://site/*"
+      ],
+      "js": [
+        "ext/page/index.js"
+      ]
     }
   ]
 }
