@@ -1,4 +1,4 @@
-import { logit, getActiveTab, isInjectableTab } from "./tools/util.js";
+import { logit, getActiveTab, isInjectableTab, getPageTitle } from "./tools/util.js";
 
 // тяжёлые вычисления размещать здесь
 // очень тяжёлые передаем в web worker
@@ -26,11 +26,7 @@ const handleClick = async () => {
   chrome.scripting
     .executeScript({
       target: { tabId: tab.id },
-      func: () => {
-        // Этот код выполнится на странице и вернет результат
-        const titleTag = document.querySelector("head title");
-        return titleTag ? titleTag.textContent : "no title on this page";
-      },
+      func: getPageTitle,
     })
     .then((results) => {
       // 4. Получаем результат выполнения скрипта прямо здесь

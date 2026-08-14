@@ -26,3 +26,9 @@ export function isInjectableTab(tab) {
     return false;
   }
 }
+
+export function getPageTitle() {
+  // Этот код выполнится на странице и вернет результат
+  const titleTag = document.querySelector("head title");
+  return titleTag ? titleTag.textContent : "no title on this page";
+}
