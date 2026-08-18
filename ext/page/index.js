@@ -16,6 +16,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "UPDATE_CONTENT_CONFIG") {
     console.log('Полученны данные от Service Worker', message.data);
   }
+
+  if (message.action === "FETCH_WITH_COOKIES") {
+    fetch(message.url, {
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.text(); // или res.json(), если там API
+      })
+      .then((data) => sendResponse({ success: true, data: data }))
+      .catch((err) => sendResponse({ success: false, error: err.message }));
+
+    return true; // Важно! Говорит браузеру, что ответ будет асинхронным
+  }
 });
 
 chrome.runtime.sendMessage({ action: "CONTENT_SCRIPT_READY" });
