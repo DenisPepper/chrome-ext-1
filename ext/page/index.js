@@ -14,10 +14,20 @@
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "UPDATE_CONTENT_CONFIG") {
+    // Игнорируем, если вкладка не активна или не видна
+    if (document.hidden) return;
+    // Игнорируем iframe (если нужно)
+    if (window !== window.top) return;
+
     console.log('Полученны данные от Service Worker', message.data);
   }
 
   if (message.action === "FETCH_WITH_COOKIES") {
+    // Игнорируем, если вкладка не активна или не видна
+    if (document.hidden) return;
+    // Игнорируем iframe (если нужно)
+    if (window !== window.top) return;
+
     fetch(message.url, {
       credentials: "include",
     })
