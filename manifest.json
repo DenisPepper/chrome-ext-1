@@ -18,7 +18,7 @@
     "default_title": "Панель инструментов SK-toolbox"
   },
   "side_panel": {
-    "default_path": "ext/panel/dist/index.html"
+    "default_path": "ext/panel/index.html"
   },
   "background": {
     "service_worker": "ext/worker/index.js",
