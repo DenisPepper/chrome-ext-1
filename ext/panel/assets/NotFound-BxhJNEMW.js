@@ -1,0 +1,1 @@
+import{o as e}from"./index-CoWr0-4b.js";var t=e(`<div><h1>404 - Страница не найдена</h1><p>Запрашиваемая страница не существует`);function n(){return t()}export{n as default};
