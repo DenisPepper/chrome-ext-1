@@ -12,13 +12,18 @@
 6. Внедрение стилей — изоляция интерфейса расширения внутри страницы с помощью Shadow DOM.
 */
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "UPDATE_CONTENT_CONFIG") {
+function addTabChecking(fn) {
+  return function (...args) {
     // Игнорируем, если вкладка не активна или не видна
     if (document.hidden) return;
     // Игнорируем iframe (если нужно)
     if (window !== window.top) return;
+    fn(...args);
+  };
+}
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "UPDATE_CONTENT_CONFIG") {
     console.log('Полученны данные от Service Worker', message.data);
   }
 
