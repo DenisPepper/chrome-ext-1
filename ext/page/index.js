@@ -1,7 +1,6 @@
 // в content.js (который работает прямо на странице сайта) стандартные ESM-импорты через манифест до сих пор официально
 // не поддерживаются из коробки, там логика подключения модулей немного сложнее.
 
-
 /* 
 Вот сокращенный список главных задач content.js, определяющих его системную функциональность:
 1. Запуск до отрисовки (document_start) — внедрение в страницу до загрузки ее HTML и выполнения скриптов сайта [исх. 2].
@@ -13,42 +12,47 @@
 */
 
 function addTabChecking(fn) {
-  return function (...args) {
+  return function (message, sender, sendResponse, ...args) {
     // Игнорируем, если вкладка не активна или не видна
-    if (document.hidden) return;
-    // Игнорируем iframe (если нужно)
-    if (window !== window.top) return;
-    return fn(...args);
+    if (document.hidden || window !== window.top) {
+      sendResponse({ ignored: true, reason: document.hidden ? 'hidden' : 'iframe' });
+      return true;
+    }
+    return fn(message, sender, sendResponse, ...args);
   };
 }
 
-const useFetch = (message, sender, sendResponse) => {
-  const fn = () => {
+const handlers = {
+  UPDATE_CONTENT_CONFIG: (message, sender, sendResponse) => {
+    console.log('Получены данные от Service Worker', message.data);
+    sendResponse({ received: true });
+    return true;
+  },
+
+  FETCH_WITH_COOKIES: (message, sender, sendResponse) => {
     fetch(message.url, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.text(); // или res.json(), если там API
+        return res.text();
       })
       .then((data) => sendResponse({ success: true, data: data }))
       .catch((err) => sendResponse({ success: false, error: err.message }));
 
-    return true; // Важно! Говорит браузеру, что ответ будет асинхронным
+    return true;
   }
-
-  const handler = addTabChecking(fn);
-  return handler()
-}
+};
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "UPDATE_CONTENT_CONFIG") {
-    console.log('Полученны данные от Service Worker', message.data);
+  const handler = handlers[message.action];
+  if (!handler) {
+    sendResponse({ error: 'Unknown action' });
+    return true;
   }
 
-  if (message.action === "FETCH_WITH_COOKIES") {
-    return useFetch(message, sender, sendResponse);
-  }
+  const wrappedHandler = addTabChecking(handler);
+  return wrappedHandler(message, sender, sendResponse);
 });
 
 chrome.runtime.sendMessage({ action: "CONTENT_SCRIPT_READY" });
