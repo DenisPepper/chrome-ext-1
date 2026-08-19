@@ -18,21 +18,12 @@ function addTabChecking(fn) {
     if (document.hidden) return;
     // Игнорируем iframe (если нужно)
     if (window !== window.top) return;
-    fn(...args);
+    return fn(...args);
   };
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "UPDATE_CONTENT_CONFIG") {
-    console.log('Полученны данные от Service Worker', message.data);
-  }
-
-  if (message.action === "FETCH_WITH_COOKIES") {
-    // Игнорируем, если вкладка не активна или не видна
-    if (document.hidden) return;
-    // Игнорируем iframe (если нужно)
-    if (window !== window.top) return;
-
+const useFetch = (message, sender, sendResponse) => {
+  const fn = () => {
     fetch(message.url, {
       credentials: "include",
     })
@@ -44,6 +35,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .catch((err) => sendResponse({ success: false, error: err.message }));
 
     return true; // Важно! Говорит браузеру, что ответ будет асинхронным
+  }
+
+  const handler = addTabChecking(fn);
+  return handler()
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "UPDATE_CONTENT_CONFIG") {
+    console.log('Полученны данные от Service Worker', message.data);
+  }
+
+  if (message.action === "FETCH_WITH_COOKIES") {
+    return useFetch(message, sender, sendResponse);
   }
 });
 
