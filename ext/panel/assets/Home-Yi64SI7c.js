@@ -1,0 +1,1 @@
+import{a as e}from"./index-uVEHT6lQ.js";var t=e(`<div><h1>Главная страница</h1><p>Добро пожаловать!`);function n(){return t()}export{n as default};
