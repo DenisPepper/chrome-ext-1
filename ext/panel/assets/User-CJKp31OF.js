@@ -1,0 +1,1 @@
+import{a as e,i as t,n,s as r,t as i}from"./index-EIOG6pCl.js";var a=r(`<div><h1>Профиль пользователя</h1><p>ID пользователя: </p><button type=button>На главную`);function o(){let t=n(),r=i();return(()=>{var n=a(),i=n.firstChild.nextSibling;i.firstChild;var o=i.nextSibling;return e(i,()=>t.id,null),o.$$click=()=>r(`/`),n})()}t([`click`]);export{o as default};

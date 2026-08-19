@@ -1,1 +1,0 @@
-import{o as e}from"./index-CoWr0-4b.js";var t=e(`<div><h1>О нас</h1><p>Информация о компании`);function n(){return t()}export{n as default};

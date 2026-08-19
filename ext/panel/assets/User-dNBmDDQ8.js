@@ -1,1 +1,0 @@
-import{i as e,n as t,o as n,r,t as i}from"./index-CoWr0-4b.js";var a=n(`<div><h1>Профиль пользователя</h1><p>ID пользователя: </p><button type=button>На главную`);function o(){let n=t(),r=i();return(()=>{var t=a(),i=t.firstChild.nextSibling;i.firstChild;var o=i.nextSibling;return e(i,()=>n.id,null),o.$$click=()=>r(`/`),t})()}r([`click`]);export{o as default};
