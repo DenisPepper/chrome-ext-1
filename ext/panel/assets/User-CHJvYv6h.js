@@ -1,0 +1,1 @@
+import{a as e,i as t,n,r,t as i}from"./index-BOJYKzmE.js";var a=e(`<div><h1>Профиль пользователя</h1><p>ID пользователя: </p><button type=button>На главную`);function o(){let e=n(),r=i();return(()=>{var n=a(),i=n.firstChild.nextSibling;i.firstChild;var o=i.nextSibling;return t(i,()=>e.id,null),o.$$click=()=>r(`/`),n})()}r([`click`]);export{o as default};

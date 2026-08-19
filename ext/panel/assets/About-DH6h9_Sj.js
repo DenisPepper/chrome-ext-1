@@ -1,0 +1,1 @@
+import{a as e}from"./index-BOJYKzmE.js";var t=e(`<div><h1>О нас</h1><p>Информация о компании`);function n(){return t()}export{n as default};
