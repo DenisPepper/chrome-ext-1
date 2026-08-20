@@ -1,0 +1,1 @@
+import{l as e}from"./index-BZRkJkGG.js";var t=e(`<div><h1>404 - Страница не найдена</h1><p>Запрашиваемая страница не существует`);function n(){return t()}export{n as default};

@@ -1,1 +1,0 @@
-import{l as e}from"./index-D_wPZ1jh.js";var t=e(`<div><h1>О нас</h1><p>Информация о компании`);function n(){return t()}export{n as default};
