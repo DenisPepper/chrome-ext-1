@@ -11,7 +11,7 @@
 6. Внедрение стилей — изоляция интерфейса расширения внутри страницы с помощью Shadow DOM.
 */
 
-export function isTargetPage(target) {
+function isTargetPage(target) {
   const element = document.querySelector(".pageheadtext");
   if (!element) return false;
   const text = element.innerText.trim();
