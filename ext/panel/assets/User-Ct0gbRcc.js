@@ -1,1 +1,0 @@
-import{a as e,l as t,n,o as r,t as i}from"./index-XfEUFdNm.js";var a=t(`<div><h1>Профиль пользователя</h1><p>ID пользователя: </p><button type=button>На главную`);function o(){let e=n(),t=i();return(()=>{var n=a(),i=n.firstChild.nextSibling;i.firstChild;var o=i.nextSibling;return r(i,()=>e.id,null),o.$$click=()=>t(`/`),n})()}e([`click`]);export{o as default};
