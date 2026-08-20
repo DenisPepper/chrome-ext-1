@@ -11,6 +11,13 @@
 6. Внедрение стилей — изоляция интерфейса расширения внутри страницы с помощью Shadow DOM.
 */
 
+export function isTargetPage(target) {
+  const element = document.querySelector(".pageheadtext");
+  if (!element) return false;
+  const text = element.innerText.trim();
+  return text === target;
+}
+
 function addTabChecking(fn) {
   return function (message, sender, sendResponse, ...args) {
     // Игнорируем, если вкладка не активна или не видна
