@@ -1,3 +1,5 @@
+import { ElementFinder } from './util/element-finder.js'
+
 // в content.js (который работает прямо на странице сайта) стандартные ESM-импорты через манифест до сих пор официально
 // не поддерживаются из коробки, там логика подключения модулей немного сложнее.
 
@@ -12,6 +14,10 @@
 */
 
 function isTargetPage(target) {
+  const ef = new ElementFinder();
+  ef.hello()
+
+
   const element = document.querySelector(".pageheadtext");
   if (!element) return false;
   const text = element.innerText.trim();
