@@ -30,7 +30,7 @@
         "https://site/*"
       ],
       "js": [
-        "ext/page/finder.js",
+        "ext/page/page-manager.js",
         "ext/page/index.js"
       ]
     }
