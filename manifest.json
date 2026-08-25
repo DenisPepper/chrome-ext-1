@@ -30,7 +30,7 @@
                 "https://cad.stilkuhni.com/*"
             ],
             "js": [
-                "ext/page/page-manager.js",
+                "ext/page/data-copier.js",
                 "ext/page/index.js"
             ]
         }
