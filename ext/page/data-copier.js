@@ -1,4 +1,4 @@
-class PageManager {
+class DataCopier {
   // ============ ПРИВАТНЫЕ ПОЛЯ ============
   #data = null;
   #blockTypes = null;
@@ -15,7 +15,7 @@ class PageManager {
   }
 
   #useEnum(items) {
-    if (!Array.isArray(items)) throw new Error("PageManager error[1]");
+    if (!Array.isArray(items)) throw new Error("DataCopier error[1]");
     const obj = this.#useMap();
     for (const item of items) {
       obj[item] = item;
@@ -276,15 +276,3 @@ class PageManager {
     }
   }
 }
-
-// Использование
-async function main(manager) {
-  return await manager.copyPageData({
-    targets: ["FINS"],
-    filter: ["FINS"],
-  });
-}
-
-const manager = new PageManager();
-//manager.useDebagger();
-const result = await main(manager);

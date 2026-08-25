@@ -13,10 +13,11 @@
 
 async function copyPageData() {
   try {
-    const res = await fetch(url, {
-      credentials: "include",
+    const copier = new DataCopier();
+    return await copier.copyPageData({
+      targets: ["FINS"],
+      filter: ["FINS"],
     });
-    return await res.text();
   } catch (error) {
     return error;
   }
@@ -26,7 +27,10 @@ function addTabChecking(fn) {
   return function (message, sender, sendResponse, ...args) {
     // Игнорируем, если вкладка не активна или не видна
     if (document.hidden || window !== window.top) {
-      sendResponse({ ignored: true, reason: document.hidden ? 'hidden' : 'iframe' });
+      sendResponse({
+        ignored: true,
+        reason: document.hidden ? "hidden" : "iframe",
+      });
       return true;
     }
     return fn(message, sender, sendResponse, ...args);
@@ -35,7 +39,7 @@ function addTabChecking(fn) {
 
 const handlers = {
   UPDATE_CONTENT_CONFIG: (message, sender, sendResponse) => {
-    console.log('Получены данные от Service Worker', message.data);
+    console.log("Получены данные от Service Worker", message.data);
     sendResponse({ received: true });
     return true;
   },
@@ -52,13 +56,13 @@ const handlers = {
       .catch((err) => sendResponse({ success: false, error: err.message }));
 
     return true;
-  }
+  },
 };
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const handler = handlers[message.action];
   if (!handler) {
-    sendResponse({ error: 'Unknown action' });
+    sendResponse({ error: "Unknown action" });
     return true;
   }
 
