@@ -92,6 +92,20 @@ class PageManager {
     return hasName && hasType;
   }
 
+  #isActive(doc, item) {
+    let id = "divdata";
+    let selector = `#${id} > .sp-content > table:last-of-type > tbody`;
+    const tbody = doc.querySelector(selector);
+    //
+    if (!tbody) console.log(item);
+    //
+    const tr = tbody.querySelector("tr:nth-child(4)");
+    const name = tr.querySelector("td:nth-child(1)").textContent.trim();
+    const isActive = tr.querySelector("td:nth-child(3)").textContent.trim();
+    if (name !== "Активность") return false;
+    return isActive === "Да";
+  }
+
   #getBlockName(block) {
     const a = block.querySelector("a");
     return a ? a.textContent.trim() : "";
@@ -105,7 +119,10 @@ class PageManager {
   #getSourceList(block, blockType) {
     if (
       blockType === this.#blockTypes.TYPES ||
-      blockType === this.#blockTypes.VARS
+      blockType === this.#blockTypes.VARS ||
+      blockType === this.#blockTypes.FINS ||
+      blockType === this.#blockTypes.ADD_VAR ||
+      blockType === this.#blockTypes.INSETS
     ) {
       const next = block.nextElementSibling;
       if (!next || next.tagName !== "UL") return null;
@@ -210,6 +227,33 @@ class PageManager {
     }
   }
 
+  async #useFetch(url) {
+    try {
+      const res = await fetch(url, {
+        credentials: "include",
+      });
+      return await res.text();
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async #filterBlocks(cfg) {
+    for (const blockType of cfg.filter) {
+      if (!this.#can(blockType)) continue;
+      const block = this.#data.blocks.find(
+        (block) => block.type === blockType && !block.folded,
+      );
+      for (const item of block.sourceList) {
+        const html = await this.#useFetch(this.#getBlockLink(item));
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        if (this.#isActive(doc, item)) {
+          block.items.push(block.reader(item));
+        }
+      }
+    }
+  }
+
   // ============ ПУБЛИЧНЫЕ МЕТОДЫ ============
   getBlockTypes() {
     return Object.keys(this.#blockTypes);
@@ -225,7 +269,7 @@ class PageManager {
   async copyPageData(cfg) {
     try {
       this.#createBlocks(cfg);
-
+      await this.#filterBlocks(cfg);
       return { success: true, data: this.#data };
     } catch (error) {
       return { success: false, error: error.message };
@@ -234,12 +278,13 @@ class PageManager {
 }
 
 // Использование
+async function main(manager) {
+  return await manager.copyPageData({
+    targets: ["FINS"],
+    filter: ["FINS"],
+  });
+}
+
 const manager = new PageManager();
-
-manager.useDebagger();
-
-/*
-const pageData = await manager.copyPageData({
-  targets: ["TYPES", "VARS"],
-});
-*/
+//manager.useDebagger();
+const result = await main(manager);
