@@ -8,7 +8,7 @@
         "scripting"
     ],
     "host_permissions": [
-        "https://cad.stilkuhni.com/*"
+        "https://site.com/*"
     ],
     "icons": {
         "48": "ext/icon.png"
@@ -27,7 +27,7 @@
     "content_scripts": [
         {
             "matches": [
-                "https://cad.stilkuhni.com/*"
+                "https://site.com/*"
             ],
             "js": [
                 "ext/page/data-copier.js",
