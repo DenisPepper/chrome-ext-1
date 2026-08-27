@@ -1,5 +1,6 @@
 
 import { handleGetTitle } from './get-title.js';
+import { copyPageData } from "./actions/copy-page-data.js"
 
 /* 
 фоновый скрипт (Service Worker)
@@ -32,6 +33,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       try {
         const title = await handleGetTitle();
+        sendResponse({ success: true, title });
+      } catch (error) {
+        sendResponse({ success: false, error: error.message });
+      }
+    })();
+    // ВАЖНО: возвращаем true, чтобы оставить канал сообщений открытым 
+    // для асинхронного ответа (sendResponse)
+    return true;
+  }
+  if (message.action === 'COPY_PAGE_DATA') {
+    (async () => {
+      try {
+        const title = await copyPageData(message.payload);
         sendResponse({ success: true, title });
       } catch (error) {
         sendResponse({ success: false, error: error.message });
