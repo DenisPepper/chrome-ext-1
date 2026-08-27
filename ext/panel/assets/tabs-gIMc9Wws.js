@@ -1,1 +1,0 @@
-async function e(){let[e]=await chrome.tabs.query({active:!0,lastFocusedWindow:!0});return e&&e.id?e:null}function t(e){if(!e||!e.url||!e.id||e.status!==`complete`||e.discarded)return!1;try{let t=new URL(e.url);return t.protocol===`http:`||t.protocol===`https:`}catch{return!1}}export{t as n,e as t};
