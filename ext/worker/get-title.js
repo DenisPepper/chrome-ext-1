@@ -1,9 +1,8 @@
-export async function handleGetTitle() {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+import { getActiveTab } from './util/tabs.js';
 
-    if (!tab) {
-        throw new Error('Активная вкладка не найдена');
-    }
+export async function handleGetTitle() {
+    const tab = await getActiveTab();
+    if (!isInjectableTab(tab)) throw new Error("not injectable tab");
 
     const results = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
