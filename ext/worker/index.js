@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       data: { meta: 'Service Worker data' }
     }).catch(() => { });
   }
-  if (message.action === 'COPY_PAGE_DATA') {
+  if (message.action === 'GET_URL_AND_TITLE') {
     (async () => {
       try {
         const title = await handleGetTitle();
@@ -41,4 +41,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // для асинхронного ответа (sendResponse)
     return true;
   }
+
 });
