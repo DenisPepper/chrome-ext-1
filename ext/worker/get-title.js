@@ -1,4 +1,4 @@
-import { getActiveTab } from './util/tabs.js';
+import { getActiveTab, isInjectableTab } from './util/tabs.js';
 
 export async function handleGetTitle() {
     const tab = await getActiveTab();
