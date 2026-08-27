@@ -3,6 +3,12 @@ import { injectScript, injectFunction } from '../util/scripting.js';
 // Этот код выполняется в контексте страницы.
 // Аргументы передаются через массив args в executeScript.
 async function getUrlWithPrefix(prefix) {
+
+    // ПЕРЕД КОПИРОВАНИЕМ ДАННЫХ НУЖНО ВНЕДРИТЬ 
+    // КЛАСС, РЕАЛИЗУЕТ СБОР ДАННЫХ НА СТРАНИЦЕ
+    // ЗДЕСЬ НУЖНО ВЫЗВАТЬ ЭКЗЕМПЛЯР ЭТОГО КЛАССА
+    // И ВЕРНУТЬ РЕЗУЛЬТАТ ЕГО РАБОТЫ
+
     try {
         const res = await fetch('https://cad.stilkuhni.com/ecadweb/BaseElements/ViewElementLimits?type=1&t=1732&e=22224', {
             credentials: "include",
@@ -15,6 +21,11 @@ async function getUrlWithPrefix(prefix) {
 }
 
 export async function copyPageData(payload) {
+
+    // ПЕРЕД КОПИРОВАНИЕМ ДАННЫХ НУЖНО ВНЕДРИТЬ 
+    // КЛАСС, РЕАЛИЗУЕТ СБОР ДАННЫХ НА СТРАНИЦЕ
+
+
     // 1. Заголовок получаем через файл (аргументы не нужны)
     const title = await injectScript('ext/inject/get-title.js');
 
