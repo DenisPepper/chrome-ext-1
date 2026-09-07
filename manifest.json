@@ -6,9 +6,7 @@
         "sidePanel",
         "activeTab",
         "scripting",
-        "cookies",
-        "webRequest",
-        "webRequestAuthProvider"
+        "storage"
     ],
     "host_permissions": [
         "https://site.com/*"
