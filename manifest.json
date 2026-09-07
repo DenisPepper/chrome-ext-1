@@ -5,7 +5,10 @@
     "permissions": [
         "sidePanel",
         "activeTab",
-        "scripting"
+        "scripting",
+        "cookies",
+        "webRequest",
+        "webRequestAuthProvider"
     ],
     "host_permissions": [
         "https://site.com/*"
