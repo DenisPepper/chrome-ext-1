@@ -215,6 +215,160 @@ function setupStatus() {
   return initialValue;
 }
 
+function createNewBlock(target = "Набор вставок") {
+  // нажать кнопку для создания блока
+  let id = "MainContent_MainContent_MainContent_aelement";
+  let sel = `#${id} + div`;
+  let btn = document.querySelector(sel);
+  btn.click();
+  setTimeout(() => {
+    btn.querySelector(".butontext").click();
+    setTimeout(() => {
+      let id = "MainContent_MainContent_MainContent_aelement";
+      let sel = `#${id} + div input[value="${target}"]`;
+      localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "ADDED_NEW_BLOCK");
+      document.querySelector(sel).click();
+    }, 250);
+  }, 250);
+}
+
+function increaseBlockIndex(current) {
+  localStorage.setItem(COPIER_NEXT_INDEX_KEY, current + 1);
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "STARTED");
+  return upload();
+}
+
+function clickParamsEdit(block) {
+  let btn = block.querySelector(".divbut");
+  btn.click();
+  setTimeout(() => {
+    let btns = block.querySelectorAll(".butontext");
+    localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "OPEND_EDIT_PAGE");
+    btns[0].click();
+  }, 250);
+}
+
+function updateVisibility(value) {
+  if (value === "Нет") {
+    let sel = `#MainContent_MainContent_MainContent_MainContent_UCBd_RBLshowvariant_0`;
+    document.querySelector(sel).click();
+  }
+  if (value === "Да") {
+    let sel = `#MainContent_MainContent_MainContent_MainContent_UCBd_RBLshowvariant_1`;
+    document.querySelector(sel).click();
+  }
+}
+
+function updateDescription(value) {
+  let sel = `#MainContent_MainContent_MainContent_MainContent_UCBd_TBEditnamecard`;
+  let elm = document.querySelector(sel);
+  elm.value = value;
+  sel = `#MainContent_MainContent_MainContent_MainContent_UCBd_ButEditnamecard`;
+  document.querySelector(sel).click();
+}
+
+function udateDescVisibility(value) {
+  if (value === "Нет") {
+    let sel = `#MainContent_MainContent_MainContent_MainContent_UCBd_RBLshowname_0`;
+    document.querySelector(sel).click();
+  }
+  if (value === "Да") {
+    let sel = `#MainContent_MainContent_MainContent_MainContent_UCBd_RBLshowname_1`;
+    document.querySelector(sel).click();
+  }
+}
+
+function udateWShift(value) {
+  let input = document.getElementById("parelmcontrol1");
+  input.value = value;
+  let elm = document.getElementById("divparelm1");
+  elm.querySelector(`input[type="button"][value="OK"]`).click();
+}
+
+function udateHShift(value) {
+  let input = document.getElementById("parelmcontrol2");
+  input.value = value;
+  let elm = document.getElementById("divparelm2");
+  elm.querySelector(`input[type="button"][value="OK"]`).click();
+}
+
+function udateZPosition(value) {
+  let input = document.getElementById("parelmcontrol3");
+  input.value = value;
+  let elm = document.getElementById("divparelm3");
+  elm.querySelector(`input[type="button"][value="OK"]`).click();
+}
+
+function udateBeadHeight(value) {
+  let input = document.getElementById("parelmcontrol4");
+  input.value = value;
+  let elm = document.getElementById("divparelm4");
+  elm.querySelector(`input[type="button"][value="OK"]`).click();
+}
+
+function udateWidth(value) {
+  let input = document.getElementById("parelmcontrol5");
+  input.value = value;
+  let elm = document.getElementById("divparelm5");
+  elm.querySelector(`input[type="button"][value="OK"]`).click();
+}
+
+function udateHeight(value) {
+  let input = document.getElementById("parelmcontrol6");
+  input.value = value;
+  let elm = document.getElementById("divparelm6");
+  elm.querySelector(`input[type="button"][value="OK"]`).click();
+}
+
+function writeData(data) {
+  const values = readValues(document);
+  const key = localStorage.getItem(COPIER_NEXT_EDIT_VALUE_KEY);
+  if (key === null) {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "VISIBILITY");
+    return writeData(data);
+  } else if (key === "VISIBILITY") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "DESK");
+    if (values.visibility === data.visibility) return writeData(data);
+    return updateVisibility(data.visibility);
+  } else if (key === "DESK") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "DESCVISIBILITY");
+    if (values.desc === data.desc) return writeData(data);
+    return updateDescription(data.desc);
+  } else if (key === "DESCVISIBILITY") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "WIDTH_SHIFT");
+    if (values.descVisibility === data.descVisibility) return writeData(data);
+    return udateDescVisibility(data.descVisibility);
+  } else if (key === "WIDTH_SHIFT") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "HEIGHT_SHIFT");
+    if (values.wShift === data.wShift) return writeData(data);
+    return udateWShift(data.wShift);
+  } else if (key === "HEIGHT_SHIFT") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "Z_POSITION");
+    if (values.hShift === data.hShift) return writeData(data);
+    return udateHShift(data.hShift);
+  } else if (key === "Z_POSITION") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "BEAD_HEIGHT");
+    if (values.zPos === data.zPos) return writeData(data);
+    return udateZPosition(data.zPos);
+  } else if (key === "BEAD_HEIGHT") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "WIDTH");
+    if (values.beadH === data.beadH) return writeData(data);
+    return udateBeadHeight(data.beadH);
+  } else if (key === "WIDTH") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "HEIGHT");
+    if (values.width === data.width) return writeData(data);
+    return udateWidth(data.width);
+  } else if (key === "HEIGHT") {
+    localStorage.setItem(COPIER_NEXT_EDIT_VALUE_KEY, "FINISH_EDIT");
+    if (values.height === data.height) return writeData(data);
+    return udateHeight(data.height);
+  } else if (key === "FINISH_EDIT") {
+    localStorage.removeItem(COPIER_NEXT_EDIT_VALUE_KEY);
+    localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "ENDED_EDIT_DATA");
+    location.reload();
+  }
+}
+
 function upload() {
   // проверить наличие данных в LStorage
   const dataAsString = localStorage.getItem(INSET_COPIER_KEY);
@@ -231,7 +385,18 @@ function upload() {
   const block = findBlockByName(blockData.name);
   // обработка
   if (status === "STARTED") {
-    return clearLocalStorage();
+    // создать новый блок (если нет)
+    if (block === null) return createNewBlock();
+    // переход на следующий блок
+    if (block) return increaseBlockIndex(current);
+  } else if (status === "ADDED_NEW_BLOCK") {
+    // нажать кнопку папаметры
+    return clickParamsEdit(block);
+  } else if (status === "OPEND_EDIT_PAGE") {
+    // заполнить новый блок данными
+    return writeData(blockData.data);
+  } else if (status === "ENDED_EDIT_DATA") {
+    return increaseBlockIndex(current);
   }
 }
 
