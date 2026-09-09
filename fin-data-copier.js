@@ -2,7 +2,8 @@ const FIN_COPIER_KEY = "FIN_VARIANTS_DATA";
 const COPIER_PROCESS_STATUS_KEY = "COPIER_PROCESS_STATUS";
 const COPIER_CURRENT_INDEX_KEY = "COPIER_CURRENT_INDEX";
 const COPIER_NEXT_INDEX_KEY = "COPIER_NEXT_INDEX";
-const COPIER_NEXT_EDIT_ITEM_KEY = "COPIER_NEXT_EDIT_VALUE";
+const COPIER_EDIT_ID_STATUS_KEY = "COPIER_EDIT_ID_STATUS";
+const COPIER_EDIT_ID_INDEX_KEY = "COPIER_EDIT_ID_INDEX";
 
 function useMap() {
   return Object.create(null);
@@ -247,6 +248,75 @@ function removeExcessItems(items, block) {
   return upload();
 }
 
+function clickOnItem(block, index) {
+  localStorage.setItem(COPIER_EDIT_ID_STATUS_KEY, "PRICE_EDIT_PAGE_OPENED");
+  let item = getSourceList(block)[index];
+  item.querySelector("a").click();
+}
+
+function savePriceId(price) {
+  localStorage.setItem(COPIER_EDIT_ID_STATUS_KEY, "PRICE_EDIT_ID_SAVED");
+  let id = `MainContent_MainContent_MainContent_MainContent_TBEditidprice`;
+  document.getElementById(id).value = price;
+  id = `MainContent_MainContent_MainContent_MainContent_ButEditidprice`;
+  document.getElementById(id).click();
+}
+
+function checkPriceId(price) {
+  let data = readFinValues(document);
+  if (price === data.price) {
+    localStorage.setItem(COPIER_EDIT_ID_STATUS_KEY, "PRICE_EDIT_ID_CORRECT");
+  } else {
+    localStorage.setItem(COPIER_EDIT_ID_STATUS_KEY, "PRICE_EDIT_ID_INCORRECT");
+  }
+  upload();
+}
+
+function increaseElementIndex() {
+  localStorage.removeItem(COPIER_EDIT_ID_STATUS_KEY);
+  let index = localStorage.getItem(COPIER_EDIT_ID_INDEX_KEY);
+  localStorage.setItem(COPIER_EDIT_ID_INDEX_KEY, Number(index) + 1);
+  upload();
+}
+
+function exitPriceIdEdit() {
+  localStorage.removeItem(COPIER_EDIT_ID_STATUS_KEY);
+  localStorage.removeItem(COPIER_EDIT_ID_INDEX_KEY);
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "UPDATED_PRICES");
+  upload();
+}
+
+function updatePriceId(items, block) {
+  // определить статус
+  let status = localStorage.getItem(COPIER_EDIT_ID_STATUS_KEY);
+  status = status ?? "PRICE_EDIT_STARTED";
+  // определить индекс элемента
+  let index = localStorage.getItem(COPIER_EDIT_ID_INDEX_KEY);
+  index = index ?? 0;
+  // сравнить индекс с длинной массива элементов
+  if (index >= items.length) {
+    return exitPriceIdEdit();
+  }
+  // данные из хранилища
+  const { price } = items[index];
+  // обработка
+  if (status === "PRICE_EDIT_STARTED") {
+    return clickOnItem(block, index);
+  } else if (status === "PRICE_EDIT_PAGE_OPENED") {
+    // заполнить и сохранить price ID
+    return savePriceId(price);
+  } else if (status === "PRICE_EDIT_ID_SAVED") {
+    // проверить сохраненный price ID
+    return checkPriceId(price);
+  } else if (status === "PRICE_EDIT_ID_CORRECT") {
+    // увеличить индекс элемента
+    return increaseElementIndex();
+  } else if (status === "PRICE_EDIT_ID_INCORRECT") {
+    // отправить на повторное сохрание
+    return savePriceId(price);
+  }
+}
+
 function upload() {
   // проверить наличие данных в LStorage
   const dataAsString = localStorage.getItem(FIN_COPIER_KEY);
@@ -280,6 +350,10 @@ function upload() {
     // удалить лишние элементы
     return removeExcessItems(blockData.items, block);
   } else if (status === "REMOVED_EXCESS_ITEMS") {
+    // зполнить цены
+    return updatePriceId(blockData.items, block);
+  } else if (status === "UPDATED_PRICES") {
+    // конец
     return clearLocalStorage();
   }
 }
@@ -288,7 +362,8 @@ function clearLocalStorage() {
   localStorage.removeItem(COPIER_PROCESS_STATUS_KEY);
   localStorage.removeItem(COPIER_CURRENT_INDEX_KEY);
   localStorage.removeItem(COPIER_NEXT_INDEX_KEY);
-  localStorage.removeItem(COPIER_NEXT_EDIT_ITEM_KEY);
+  localStorage.removeItem(COPIER_EDIT_ID_STATUS_KEY);
+  localStorage.removeItem(COPIER_EDIT_ID_INDEX_KEY);
 }
 
 function createCopyButton() {
