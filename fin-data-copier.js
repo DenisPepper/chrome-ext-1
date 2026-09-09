@@ -2,7 +2,7 @@ const FIN_COPIER_KEY = "FIN_VARIANTS_DATA";
 const COPIER_PROCESS_STATUS_KEY = "COPIER_PROCESS_STATUS";
 const COPIER_CURRENT_INDEX_KEY = "COPIER_CURRENT_INDEX";
 const COPIER_NEXT_INDEX_KEY = "COPIER_NEXT_INDEX";
-const COPIER_NEXT_EDIT_VALUE_KEY = "COPIER_NEXT_EDIT_VALUE";
+const COPIER_NEXT_EDIT_ITEM_KEY = "COPIER_NEXT_EDIT_VALUE";
 
 function useMap() {
   return Object.create(null);
@@ -138,11 +138,157 @@ function isTargetPage(title) {
   return title === pageTitle;
 }
 
+function setupCurrentIndex() {
+  let current = localStorage.getItem(COPIER_CURRENT_INDEX_KEY);
+  let next = localStorage.getItem(COPIER_NEXT_INDEX_KEY);
+  if (current === null) {
+    // первый блок в списке
+    current = 0;
+  } else if (next === null) {
+    // обработка первого не завершена
+    current = Number(current);
+  } else if (next !== null) {
+    // обработка следующего
+    current = Number(next);
+  }
+  localStorage.setItem(COPIER_CURRENT_INDEX_KEY, current);
+  return current;
+}
+
+function readValSubName(str) {
+  const parts = str.split("|");
+  const end = parts.at(-1);
+  return end.trim();
+}
+
+function findBlockByName(name) {
+  const newSubName = readValSubName(name);
+  const blocks = getBlocks();
+  for (const block of blocks) {
+    const subName = readValSubName(getBlockName(block));
+    if (subName === newSubName) return block;
+  }
+  return null;
+}
+
+function setupStatus() {
+  const initialValue = "STARTED";
+  const status = localStorage.getItem(COPIER_PROCESS_STATUS_KEY);
+  if (status !== null) return status;
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, initialValue);
+  return initialValue;
+}
+
+function clickBlockLink(block) {
+  let link = block.querySelector("a");
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "OPEND_LIST_PAGE");
+  link.click();
+}
+
+function clickShowAll() {
+  let sel = `#MainContent_MainContent_MainContent_MainContent_LBall`;
+  let link = document.querySelector(sel);
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "OPEND_ALL_LIST");
+  link.click();
+}
+
+function pickTargetItems(items) {
+  //
+  const targets = items.map(
+    ({ code, mnemo, name }) => `${code} | ${mnemo} | ${name}`,
+  );
+  //
+  let id = `MainContent_MainContent_MainContent_MainContent_GridViewBlock`;
+  let sel = "tbody > tr:not(:first-child)";
+  let rows = document.getElementById(id).querySelectorAll(sel);
+  for (const row of rows) {
+    const code = row.querySelector("td:nth-child(3)").textContent.trim();
+    const mnemo = row.querySelector("td:nth-child(4)").textContent.trim();
+    const name = row.querySelector("td:nth-child(5)").textContent.trim();
+    if (targets.includes(`${code} | ${mnemo} | ${name}`)) {
+      sel = "td:nth-child(2) > input";
+      row.querySelector(sel).checked = true;
+    }
+  }
+  //
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "CHECKED_TARGET_ITEMS");
+  id = "MainContent_MainContent_MainContent_MainContent_ButAdd";
+  document.getElementById(id).click();
+}
+
+function clickDeleteListElement(block) {
+  let btn = block.querySelector(".divbut");
+  let cb1 = () => {
+    let btn = block.querySelector('.divbut input[type="button"][value="Да"]');
+    btn.click();
+  };
+  let cb2 = () => {
+    let btns = block.querySelectorAll(".butontext");
+    btns[0].click();
+    setTimeout(cb1, 250);
+  };
+  btn.click();
+  setTimeout(cb2, 250);
+}
+
+function removeExcessItems(items, block) {
+  //
+  const links = items.map(({ link }) => link.split("c=").at(1));
+  //
+  let list = getSourceList(block);
+  for (const elm of list) {
+    let link = getBlockLink(elm).split("c=").at(1);
+    if (!links.includes(link)) {
+      // нажать удалить
+      return clickDeleteListElement(elm);
+    }
+  }
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "REMOVED_EXCESS_ITEMS");
+  return upload();
+}
+
+function upload() {
+  // проверить наличие данных в LStorage
+  const dataAsString = localStorage.getItem(FIN_COPIER_KEY);
+  if (dataAsString === null) return;
+  const data = JSON.parse(dataAsString);
+  //
+  // определить индекс блока для текущей обработки
+  const current = setupCurrentIndex();
+  //
+  // проверить наличие данных для блока
+  const blockData = data[current];
+  if (!blockData) return clearLocalStorage();
+  //
+  // стартует обработку, чтобы upload стартовал при перезагрузках
+  const status = setupStatus();
+  //
+  // получит ссылку на блок
+  const block = findBlockByName(blockData.name);
+  //
+  // обработка
+  if (status === "STARTED") {
+    // нажать на ссылку (блок)
+    return clickBlockLink(block);
+  } else if (status === "OPEND_LIST_PAGE") {
+    // нажать на кнопку "Показать все"
+    return clickShowAll();
+  } else if (status === "OPEND_ALL_LIST") {
+    // отместить только нужные элементы списка
+    return pickTargetItems(blockData.items);
+  } else if (status === "CHECKED_TARGET_ITEMS") {
+    // удалить лишние элементы
+    return removeExcessItems(blockData.items, block);
+  } else if (status === "REMOVED_EXCESS_ITEMS") {
+    return clearLocalStorage();
+  }
+}
+
 function clearLocalStorage() {
   localStorage.removeItem(COPIER_PROCESS_STATUS_KEY);
   localStorage.removeItem(COPIER_CURRENT_INDEX_KEY);
   localStorage.removeItem(COPIER_NEXT_INDEX_KEY);
-  localStorage.removeItem(COPIER_NEXT_EDIT_VALUE_KEY);
+  localStorage.removeItem(COPIER_NEXT_EDIT_ITEM_KEY);
 }
 
 function createCopyButton() {
@@ -163,15 +309,24 @@ function createClearButton() {
   document.body.appendChild(btn);
 }
 
+function createUploadButton() {
+  const btn = document.createElement("button");
+  btn.innerText = "Upload Fins from LS";
+  btn.classList.add("fin-button");
+  btn.classList.add("fin-upload-button");
+  btn.onclick = upload;
+  document.body.appendChild(btn);
+}
+
 function main() {
   const targetPage = isTargetPage("ФАСАДЫ");
   if (!targetPage) return;
   const started = localStorage.getItem(COPIER_PROCESS_STATUS_KEY);
   if (started) {
-    //upload();
+    upload();
   } else {
     createCopyButton();
-    //createUploadButton();
+    createUploadButton();
   }
   createClearButton();
 }
