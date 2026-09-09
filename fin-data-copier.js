@@ -138,12 +138,28 @@ function isTargetPage(title) {
   return title === pageTitle;
 }
 
+function clearLocalStorage() {
+  localStorage.removeItem(COPIER_PROCESS_STATUS_KEY);
+  localStorage.removeItem(COPIER_CURRENT_INDEX_KEY);
+  localStorage.removeItem(COPIER_NEXT_INDEX_KEY);
+  localStorage.removeItem(COPIER_NEXT_EDIT_VALUE_KEY);
+}
+
 function createCopyButton() {
   const btn = document.createElement("button");
   btn.innerText = "Copy Fins to LS";
   btn.classList.add("fin-button");
   btn.classList.add("fin-copy-button");
   btn.onclick = copy;
+  document.body.appendChild(btn);
+}
+
+function createClearButton() {
+  const btn = document.createElement("button");
+  btn.innerText = "Clear Fins in LS";
+  btn.classList.add("fin-button");
+  btn.classList.add("fin-clear-button");
+  btn.onclick = clearLocalStorage;
   document.body.appendChild(btn);
 }
 
