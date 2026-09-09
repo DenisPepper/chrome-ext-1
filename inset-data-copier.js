@@ -3,6 +3,7 @@ const COPIER_PROCESS_STATUS_KEY = "COPIER_PROCESS_STATUS";
 const COPIER_CURRENT_INDEX_KEY = "COPIER_CURRENT_INDEX";
 const COPIER_NEXT_INDEX_KEY = "COPIER_NEXT_INDEX";
 const COPIER_NEXT_EDIT_VALUE_KEY = "COPIER_NEXT_EDIT_VALUE";
+const REMOVE_BLOCK_NEXT_ACTION_KEY = "REMOVE_BLOCK_NEXT_ACTION";
 
 function useMap() {
   return Object.create(null);
@@ -189,6 +190,94 @@ async function copy() {
   localStorage.setItem(INSET_COPIER_KEY, JSON.stringify(data));
 }
 
+function setupCurrentIndex() {
+  let current = localStorage.getItem(COPIER_CURRENT_INDEX_KEY);
+  let next = localStorage.getItem(COPIER_NEXT_INDEX_KEY);
+  if (current === null) {
+    // первый блок в списке
+    current = 0;
+  } else if (next === null) {
+    // обработка первого не завершена
+    current = Number(current);
+  } else if (next !== null) {
+    // обработка следующего
+    current = Number(next);
+  }
+  localStorage.setItem(COPIER_CURRENT_INDEX_KEY, current);
+  return current;
+}
+
+function setupStatus() {
+  const initialValue = "STARTED";
+  const status = localStorage.getItem(COPIER_PROCESS_STATUS_KEY);
+  if (status !== null) return status;
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, initialValue);
+  return initialValue;
+}
+
+function upload() {
+  // проверить наличие данных в LStorage
+  const dataAsString = localStorage.getItem(INSET_COPIER_KEY);
+  if (dataAsString === null) return;
+  const data = JSON.parse(dataAsString);
+  // определить индекс блока для текущей обработки
+  const current = setupCurrentIndex();
+  // проверить наличие данных для блока
+  const blockData = data[current];
+  if (!blockData) return clearLocalStorage();
+  // стартует обработку, чтобы upload стартовал при перезагрузках
+  const status = setupStatus();
+  // проверить наличие блока на странице (по имени)
+  const block = findBlockByName(blockData.name);
+  // обработка
+  if (status === "STARTED") {
+    return clearLocalStorage();
+  }
+}
+
+function clearLocalStorage() {
+  localStorage.removeItem(COPIER_PROCESS_STATUS_KEY);
+  localStorage.removeItem(COPIER_CURRENT_INDEX_KEY);
+  localStorage.removeItem(COPIER_NEXT_INDEX_KEY);
+  localStorage.removeItem(COPIER_NEXT_EDIT_VALUE_KEY);
+}
+
+function removeBlocks(target = "Набор вставок") {
+  let action = localStorage.getItem(REMOVE_BLOCK_NEXT_ACTION_KEY);
+  action = action ?? "START_PROCESS";
+  // обработка
+  if (action === "START_PROCESS") {
+    // перейти на страницу с основными настройками
+    localStorage.setItem(REMOVE_BLOCK_NEXT_ACTION_KEY, "REMOVE_NEXT_BLOCK");
+    let id = `MainContent_MainContent_MainContent_aelement`;
+    document.getElementById(id).click();
+  } else if (action === "REMOVE_NEXT_BLOCK") {
+    // удлить следующий блок
+    const blocks = getBlocks();
+    for (const block of blocks) {
+      const name = getBlockName(block);
+      if (name.includes(target)) {
+        let btn = block.querySelector(".divbut");
+        btn.click();
+        setTimeout(() => {
+          btn.querySelector(".butontext:nth-of-type(3)").click();
+          setTimeout(() => {
+            btn.querySelector(`input[type="button"][value="Да"]`).click();
+          }, 250);
+        }, 250);
+        //
+        return;
+      }
+    }
+    localStorage.setItem(REMOVE_BLOCK_NEXT_ACTION_KEY, "FINISH_PROCESS");
+    removeBlocks();
+  } else if (action === "FINISH_PROCESS") {
+    // закончить обработку
+    localStorage.removeItem(REMOVE_BLOCK_NEXT_ACTION_KEY);
+    return;
+  }
+}
+
 function isTargetPage(title) {
   const titleElement = document.querySelector(".pageheadtext");
   if (!titleElement) return false;
@@ -205,17 +294,47 @@ function createCopyButton() {
   document.body.appendChild(btn);
 }
 
+function createUploadButton() {
+  const btn = document.createElement("button");
+  btn.innerText = "Upload Insets from LS";
+  btn.classList.add("ins-button");
+  btn.classList.add("ins-upload-button");
+  btn.onclick = upload;
+  document.body.appendChild(btn);
+}
+
+function createClearButton() {
+  const btn = document.createElement("button");
+  btn.innerText = "Clear Insets in LS";
+  btn.classList.add("ins-button");
+  btn.classList.add("ins-clear-button");
+  btn.onclick = clearLocalStorage;
+  document.body.appendChild(btn);
+}
+
+function createRemoveBlocksButton() {
+  const btn = document.createElement("button");
+  btn.innerText = "Remove Insets Blocks";
+  btn.classList.add("ins-button");
+  btn.classList.add("ins-remove-button");
+  btn.onclick = removeBlocks;
+  document.body.appendChild(btn);
+}
+
 function main() {
   const targetPage = isTargetPage("ФАСАДЫ");
   if (!targetPage) return;
   const started = localStorage.getItem(COPIER_PROCESS_STATUS_KEY);
   if (started) {
-    //upload();
+    upload();
   } else {
     createCopyButton();
-    //createUploadButton();
+    createUploadButton();
   }
-  //createClearButton();
+  const removeStarted = localStorage.getItem(REMOVE_BLOCK_NEXT_ACTION_KEY);
+  if (removeStarted) removeBlocks();
+  createClearButton();
+  createRemoveBlocksButton();
 }
 
 main();
