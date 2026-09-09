@@ -74,6 +74,12 @@ class DataCopier {
     return hasName && hasType;
   }
 
+  #isAddVals(blockType, blockName) {
+    const hasName = blockName.includes("Дополнительный размер");
+    const hasType = blockType === this.#blockTypes.ADD_VAL;
+    return hasName && hasType;
+  }
+
   #isAddVars(blockType, blockName) {
     const hasName = blockName.includes("Дополнительный вариант");
     const hasType = blockType === this.#blockTypes.ADD_VAR;
@@ -168,6 +174,7 @@ class DataCopier {
         if (this.#isTypes(blockType, name)) return elm;
         if (this.#isVars(blockType, name)) return elm;
         if (this.#isFins(blockType, name)) return elm;
+        if (this.#isAddVals(blockType, name)) return elm;
         if (this.#isAddVars(blockType, name)) return elm;
         if (this.#isInsets(blockType, name)) return elm;
         if (this.#isHandles(blockType, name)) return elm;
@@ -210,6 +217,11 @@ class DataCopier {
           block.sourceList = this.#getSourceList(li, blockType);
         }
       }
+      if (blockType === this.#blockTypes.ADD_VAL) {
+        block.name = this.#getBlockName(li);
+        block.link = this.#getBlockLink(li);
+        block.folded = this.#isFolded(li);
+      }
       if (blockType === this.#blockTypes.HANDLES) {
         block.name = this.#getBlockName(li);
         block.link = this.#getBlockLink(li);
@@ -239,6 +251,8 @@ class DataCopier {
   }
 
   async #filterBlocks(cfg) {
+    if (!cfg.filter) return;
+
     for (const blockType of cfg.filter) {
       if (!this.#can(blockType)) continue;
       const block = this.#data.blocks.find(
@@ -276,3 +290,10 @@ class DataCopier {
     }
   }
 }
+
+const copier = new DataCopier();
+const data = await copier.copyPageData({
+  targets: ["ADD_VAL", "ADD_VAR"],
+});
+
+console.log(data.data.blocks);
