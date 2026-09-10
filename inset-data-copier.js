@@ -369,6 +369,74 @@ function writeData(data) {
   }
 }
 
+function clickBlockLink(block) {
+  let link = block.querySelector("a");
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "OPEND_LIST_PAGE");
+  link.click();
+}
+
+function clickShowAll() {
+  let sel = `#MainContent_MainContent_MainContent_MainContent_LBall`;
+  let link = document.querySelector(sel);
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "OPEND_ALL_LIST");
+  link.click();
+}
+
+function pickTargetItems(items) {
+  //
+  const targets = items.map(
+    ({ code, mnemo, name }) => `${code} | ${mnemo} | ${name}`,
+  );
+  //
+  let id = `MainContent_MainContent_MainContent_MainContent_GridViewBlock`;
+  let sel = "tbody > tr:not(:first-child)";
+  let rows = document.getElementById(id).querySelectorAll(sel);
+  for (const row of rows) {
+    const code = row.querySelector("td:nth-child(3)").textContent.trim();
+    const mnemo = row.querySelector("td:nth-child(4)").textContent.trim();
+    const name = row.querySelector("td:nth-child(5)").textContent.trim();
+    if (targets.includes(`${code} | ${mnemo} | ${name}`)) {
+      sel = "td:nth-child(2) > input";
+      row.querySelector(sel).checked = true;
+    }
+  }
+  //
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "CHECKED_TARGET_ITEMS");
+  id = "MainContent_MainContent_MainContent_MainContent_ButAdd";
+  document.getElementById(id).click();
+}
+
+function clickDeleteListElement(block) {
+  let btn = block.querySelector(".divbut");
+  let cb1 = () => {
+    let btn = block.querySelector('.divbut input[type="button"][value="Да"]');
+    btn.click();
+  };
+  let cb2 = () => {
+    let btns = block.querySelectorAll(".butontext");
+    btns[0].click();
+    setTimeout(cb1, 250);
+  };
+  btn.click();
+  setTimeout(cb2, 250);
+}
+
+function removeExcessItems(items, block) {
+  //
+  const links = items.map(({ link }) => link.split("c=").at(1));
+  //
+  let list = getSourceList(block);
+  for (const elm of list) {
+    let link = getBlockLink(elm).split("c=").at(1);
+    if (!links.includes(link)) {
+      // нажать удалить
+      return clickDeleteListElement(elm);
+    }
+  }
+  localStorage.setItem(COPIER_PROCESS_STATUS_KEY, "REMOVED_EXCESS_ITEMS");
+  return upload();
+}
+
 function upload() {
   // проверить наличие данных в LStorage
   const dataAsString = localStorage.getItem(INSET_COPIER_KEY);
@@ -396,6 +464,19 @@ function upload() {
     // заполнить новый блок данными
     return writeData(blockData.data);
   } else if (status === "ENDED_EDIT_DATA") {
+    // нажать на ссылку (блок)
+    return clickBlockLink(block);
+  } else if (status === "OPEND_LIST_PAGE") {
+    // нажать на кнопку "Показать все"
+    return clickShowAll();
+  } else if (status === "OPEND_ALL_LIST") {
+    // отместить только нужные элементы списка
+    return pickTargetItems(blockData.items);
+  } else if (status === "CHECKED_TARGET_ITEMS") {
+    // удалить лишние элементы
+    return removeExcessItems(blockData.items, block);
+  } else if (status === "REMOVED_EXCESS_ITEMS") {
+    // переход на следующий блок
     return increaseBlockIndex(current);
   }
 }
